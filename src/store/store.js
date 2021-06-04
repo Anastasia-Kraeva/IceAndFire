@@ -1,7 +1,8 @@
 import {createStore, combineReducers, applyMiddleware, compose} from "redux";
+import { connectRouter } from 'connected-react-router'
+import { createBrowserHistory } from 'history'
+import { routerMiddleware } from 'connected-react-router'
 import thunk from "redux-thunk";
-import {persistStore, persistReducer} from "redux-persist";
-import storage from "redux-persist/lib/storage";
 
 import {sectionReducer} from "./section/reducer";
 import {navReducer} from "./nav/reducer";
@@ -10,28 +11,29 @@ import {paginationReducer} from "./pagination/reducer";
 import {recentlyViewedReducer} from "./recentlyViewed/reducer";
 //import { myMiddleware } from "../components/messageMiddleware";
 
-const persistConfig = {
-  key: "messenger",
-  storage,
-};
+const createRootReducer = (history) => combineReducers({
+  router: connectRouter(history),
+  section: sectionReducer,
+  nav: navReducer,
+  favorites: favoritesReducer,
+  pagination: paginationReducer,
+  recentlyViewed: recentlyViewedReducer,
+})
 
-const persistedReducer = persistReducer(
-  persistConfig,
-  combineReducers({
-    section: sectionReducer,
-    nav: navReducer,
-    favorites: favoritesReducer,
-    pagination: paginationReducer,
-    recentlyViewed: recentlyViewedReducer,
-  })
-);
-const composeEnhancers =
-  window.__REDUX_DEVTOOLS_EXTENSION__COMPOSE__ || compose;
-// const middelwares = [thunk, myMiddleware];
+export const history = createBrowserHistory()
 
-export const store = createStore(
-  persistedReducer,
-  composeEnhancers(applyMiddleware(thunk))
-  //composeEnhancers(applyMiddleware(...middelwares))
-);
-export const persistor = persistStore(store);
+export default function configureStore(preloadedState) {
+  const store = createStore(
+    createRootReducer(history), // root reducer with router state
+    preloadedState,
+    compose(
+      applyMiddleware(
+        routerMiddleware(history), // for dispatching history actions
+        thunk
+        // ... other middlewares ...
+      ),
+    ),
+  )
+
+  return store
+}

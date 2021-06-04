@@ -3,18 +3,18 @@ import ListItem from "./ListItem";
 import {useSelector} from "react-redux";
 
 const List = (props) => {
-  let dataAPI = null;
+  let data = null;
   const state = useSelector((state) => state);
 
   if (props.listEl) {
-    dataAPI = props.listEl
+    data = props.listEl
   } else {
-    dataAPI = state.section.dataAPI;
+    data = state.section.dataAPI;
   }
 
   return (
     <ul>
-      {dataAPI?.map((item) => {
+      {data?.map((item) => {
           let propsForItems = ({
             "item": item,
             "favoritesList": state.favorites

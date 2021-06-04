@@ -10,30 +10,32 @@ const initialState = {
   },
 }
 
-export const favoritesReducer = (state = initialState, action) => {//приходит пустой state
+export const favoritesReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_IN_FAVORITES: {
       return {
         ...state,
-        // favoritesList: {
-        //     ...state.favoritesList,
-        //     [action.needList]: [
-        //         ...(state[action.needList]),
-        //         action.payload,
-        //     ],
-        // }
+        favoritesList: {
+            ...state.favoritesList,
+            [action.needList]: {
+              ...(state.favoritesList[action.needList]),
+              [action.payload.isbn]:action.payload,
+            }
+        }
       }
     }
     case DELETE_FROM_FAVORITES: {
+      const stateFavoritesList = {...state.favoritesList[action.needList]};
+      delete stateFavoritesList[action.payload.isbn]
+
       return {
-        // ...state,
-        // favoritesList: {
-        //   ...state.favoritesList,
-        //   [action.needList]: [
-        //     ...(state[action.needList]),
-        //     delete state.favoritesList[action.needList].action.payload.isbn
-        //   ],
-        // }
+        ...state,
+        favoritesList: {
+          ...state.favoritesList,
+          [action.needList]: {
+            ...stateFavoritesList
+          }
+        }
       }
     }
     default:

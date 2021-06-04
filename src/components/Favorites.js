@@ -2,7 +2,7 @@ import React from "react";
 import List from "./forListBox/List";
 
 const Favorites = (props) => {
-  const favoritesListArr = Object.entries(props.favoritesList.favoritesList)
+  const favoritesListArr = Object.entries(props.state.favorites.favoritesList)//вызывается второй раз, причем с props=undefined
 
   return (
     <div className={"favorites_box"}>
