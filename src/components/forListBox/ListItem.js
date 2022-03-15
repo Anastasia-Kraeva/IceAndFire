@@ -64,7 +64,7 @@ const ListItem = (props) => {
         break
     }
 
-    for (const key in favoritesList[needList]) {
+    for (const key in favoritesList.favoritesList[needList]) {
       if (key === item.isbn) {
         presenceItemInListFav = true
         break

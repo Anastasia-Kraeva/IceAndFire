@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import {useSelector, useDispatch} from "react-redux";
-import {BrowserRouter, Switch, Route} from "react-router-dom";
+import {Switch, Route} from "react-router-dom";
+import {connect} from 'react-redux';
 
 import RecentlyViewed from "./RecentlyViewed";
 import DetailedInformation from "./DetailedInformation";
@@ -11,7 +12,7 @@ import ListBox from "../containers/ListBox";
 import {getSection} from "../store/section/actions";
 import {changeSection} from "../store/nav/actions";
 
-const Section = () => {
+const Section = ({pathname}) => {
   const dispatch = useDispatch();
   const state = useSelector((state) => state);
   const currentSection = state.nav.currentSectionURL;
@@ -19,15 +20,15 @@ const Section = () => {
   const urlArr = currentSection.split("/");
   const id = urlArr[urlArr.length - 1];
   const {error, isLoaded} = state.section.request;
+  const url = pathname + "?page=" + state.pagination.currentPage;
 
   const requestSection = () => {
-    dispatch(getSection());
+    dispatch(getSection(url));
   };
 
   useEffect(() => {
     requestSection();
-    const url = window.location.href.split("http://localhost:8080");
-    dispatch(changeSection(url[1]))
+    dispatch(changeSection(pathname));
   }, []);
 
   if (error) {
@@ -37,30 +38,30 @@ const Section = () => {
   } else {
     return (
       <>
-        <BrowserRouter>
-          <header>
-            <h1>{title.name}</h1>
-          </header>
-          <Nav state={state.section.sections}/>
-          <Switch>
-            <Route exact path="/">
-              <RecentlyViewed state={state}/>
-            </Route>
-            <Route exact path={["/books", "/characters", "/houses"]}>
-              <ListBox/>
-            </Route>
-            <Route
-              path={[`/books/${+id}`, `/characters/${+id}`, `/houses/${+id}`]}>
-              <DetailedInformation dataAPI={state.section.dataAPI}/>
-            </Route>
-            <Route exact path="/favorites">
-              <Favorites state={state}/>
-            </Route>
-          </Switch>
-        </BrowserRouter>
+        <header>
+          <h1>{title.name}</h1>
+        </header>
+        <Nav state={state.section.sections}/>
+        <Switch>
+          <Route exact path="/">
+            <RecentlyViewed state={state}/>
+          </Route>
+          <Route exact path={["/books", "/characters", "/houses"]}>
+            <ListBox/>
+          </Route>
+          <Route
+            path={[` / books /${+id}`, ` / characters /${+id}`, ` / houses /${+id}`]}>
+            <DetailedInformation dataAPI={state.section.dataAPI}/>
+          </Route>
+          <Route exact path="/favorites">
+            <Favorites state={state}/>
+          </Route>
+        </Switch>
       </>
     );
   }
 };
-
-export default Section;
+const mapStateToProps = state => ({
+  pathname: state.router.location.pathname,
+})
+export default connect(mapStateToProps)(Section)
